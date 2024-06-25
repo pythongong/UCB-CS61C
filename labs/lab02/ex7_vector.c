@@ -47,7 +47,6 @@ vector_t *vector_new() {
 
     /* Check our return value to make sure we got memory */
     if (retval == NULL) {
-        free(retval);
         allocation_failed();
     }
 
@@ -59,7 +58,7 @@ vector_t *vector_new() {
 
     /* Check the data attribute of our vector to make sure we got memory */
     if (retval->data == NULL) {
-        vector_delete(retval);				//Why is this line necessary?
+        free(retval);			//Why is this line necessary?
         allocation_failed();
     }
 

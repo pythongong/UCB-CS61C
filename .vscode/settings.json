@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "ex9_cycle.h": "c"
+        "ex9_cycle.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "snake_utils.h": "c"
     }
 }

@@ -7,6 +7,12 @@
 
 #include "snake_utils.h"
 
+#define WALL '#'
+#define FRUIT '*'
+#define RIGHT_HEAD 'D'
+#define RIGHT_TAIL 'd'
+#define RIGHT_BODY '>'
+
 /* Helper function definitions */
 static void set_board_at(game_state_t *state, unsigned int row, unsigned int col, char ch);
 static bool is_tail(char c);
@@ -20,16 +26,74 @@ static void find_head(game_state_t *state, unsigned int snum);
 static char next_square(game_state_t *state, unsigned int snum);
 static void update_tail(game_state_t *state, unsigned int snum);
 static void update_head(game_state_t *state, unsigned int snum);
+static void allocation_failed();
+
+static unsigned int init_rows =  18;
+static unsigned int init_cols = 20;
 
 /* Task 1 */
 game_state_t *create_default_state() {
-  // TODO: Implement this function.
-  return NULL;
+  game_state_t *default_state = malloc(sizeof(game_state_t));
+  if (default_state == NULL) {
+    allocation_failed();
+  }
+  
+  default_state->num_rows = init_rows;
+  default_state->num_snakes = 1;
+  default_state->snakes = malloc(sizeof(snake_t));
+  if (default_state->snakes == NULL)
+  {
+    free(default_state);
+    allocation_failed();
+  }
+  snake_t* snake = default_state->snakes;
+  snake->head_col = 4;
+  snake->head_row = 2;
+  snake->tail_row = 2;
+  snake->tail_col = 2;
+  snake->live = true;
+  
+
+  default_state->board = malloc(init_rows *sizeof(char*));
+  if (default_state->board == NULL) {
+    free(default_state);
+    allocation_failed();
+  }
+  
+  for (unsigned int i = 0; i < init_rows ; i++) {
+    default_state->board[i] = malloc(init_cols*sizeof(char));
+    set_board_at(default_state, i, 0, WALL);
+    set_board_at(default_state, i, init_cols-1, WALL);
+    for (unsigned int j = 1; j < init_cols-1; j++) {
+      if (i == 0 || i == init_rows -1)
+      {
+        set_board_at(default_state, i, j, WALL);
+      } else {
+        set_board_at(default_state, i, j, ' ');
+      }
+      
+      
+    }
+  }
+
+  set_board_at(default_state, 2, 9, FRUIT);
+  set_board_at(default_state, 2, 2, RIGHT_TAIL);
+  set_board_at(default_state, 2, 3, RIGHT_BODY);
+  set_board_at(default_state, 2, 4, RIGHT_HEAD);
+  return default_state;
 }
 
 /* Task 2 */
 void free_state(game_state_t *state) {
-  // TODO: Implement this function.
+  for(int i = 0; i < state->num_rows; i++) {
+    free(state->board[i]);
+  }
+  free(state->board);
+
+  for(unsigned int i = 0; i < state->num_snakes; i++) {
+    free(state->snakes+i*sizeof(snake_t*));
+  }
+  free(state);
   return;
 }
 
@@ -47,6 +111,13 @@ void save_board(game_state_t *state, char *filename) {
   FILE *f = fopen(filename, "w");
   print_board(state, f);
   fclose(f);
+}
+
+/* Utility function to handle allocation failures. In this
+   case we print a message and exit. */
+static void allocation_failed() {
+    fprintf(stderr, "Out of memory.\n");
+    exit(1);
 }
 
 /* Task 4.1 */
