@@ -21,8 +21,6 @@
 #define LEFT_BODY '<'
 #define UP_BODY '^'
 #define DOWN_BODY 'v'
-#define END '\n'
-#define TERMINATION '\0'
 
 /* Helper function definitions */
 static void set_board_at(game_state_t *state, unsigned int row , unsigned int col, char ch);
@@ -39,8 +37,8 @@ static void update_tail(game_state_t *state, unsigned int snum);
 static void update_head(game_state_t *state, unsigned int snum);
 static void allocation_failed();
 
-static unsigned int init_rows =  18;
-static unsigned int init_cols = 20;
+static const unsigned int DEFAULT_BOARD_HEIGHT =  18;
+static const unsigned int DEFAULT_BOARD_WIDTH = 20;
 
 /* Task 1 */
 game_state_t *create_default_state() {
@@ -49,14 +47,14 @@ game_state_t *create_default_state() {
     allocation_failed();
   }
   
-  default_state->num_rows = init_rows;
+  default_state->num_rows = DEFAULT_BOARD_HEIGHT;
   default_state->num_snakes = 1;
   default_state->snakes = malloc(sizeof(snake_t));
-  if (default_state->snakes == NULL)
-  {
+  if (default_state->snakes == NULL) {
     free(default_state);
     allocation_failed();
   }
+
   snake_t* snake = default_state->snakes;
   snake->head_col = 4;
   snake->head_row = 2;
@@ -65,28 +63,28 @@ game_state_t *create_default_state() {
   snake->live = true;
   
 
-  default_state->board = malloc(init_rows *sizeof(char*));
+  default_state->board = malloc(DEFAULT_BOARD_HEIGHT *sizeof(char*));
   if (default_state->board == NULL) {
+    free(default_state->snakes);
     free(default_state);
     allocation_failed();
   }
   
-  for (unsigned int i = 0; i < init_rows ; i++) {
-    default_state->board[i] = malloc((init_cols+2)*sizeof(char));
-    
-    if (default_state->board[i] == NULL)
-    {
+  for (unsigned int i = 0; i < DEFAULT_BOARD_HEIGHT ; i++) {
+    default_state->board[i] = malloc((DEFAULT_BOARD_WIDTH+2)*sizeof(char));
+    if (default_state->board[i] == NULL) {
+      default_state->num_rows = i-1;
       free_state(default_state);
       allocation_failed();
     }
-    set_board_at(default_state, i, init_cols+1, TERMINATION);
-    set_board_at(default_state, i, init_cols, END);
-    
+
+    set_board_at(default_state, i, DEFAULT_BOARD_WIDTH+1, '\0');
+    set_board_at(default_state, i, DEFAULT_BOARD_WIDTH, '\n');
     set_board_at(default_state, i, 0, WALL);
-    set_board_at(default_state, i, init_cols-1, WALL);
-    for (unsigned int j = 1; j < init_cols-1; j++) {
-      if (i == 0 || i == init_rows -1)
-      {        
+    set_board_at(default_state, i, DEFAULT_BOARD_WIDTH-1, WALL);
+
+    for (unsigned int j = 1; j < DEFAULT_BOARD_WIDTH-1; j++) {
+      if (i == 0 || i == DEFAULT_BOARD_HEIGHT -1) {        
         set_board_at(default_state, i, j, WALL);
       } else {
         set_board_at(default_state, i, j, ' ');
@@ -102,11 +100,9 @@ game_state_t *create_default_state() {
 
 /* Task 2 */
 void free_state(game_state_t *state) {
-  for (int i = 0; i < state->num_rows; i++)
-  {
+  for (int i = 0; i < state->num_rows; i++) {
     free(state->board[i]);
   }
-  
   free(state->board);
   free(state->snakes);
   free(state);
@@ -116,7 +112,7 @@ void free_state(game_state_t *state) {
 /* Task 3 */
 void print_board(game_state_t *state, FILE *fp) {
   for(int i = 0; i < state->num_rows; i++) {
-    fprintf(fp, state->board[i]);
+    fprintf(fp, "%s",state->board[i]);
   }
   return;
 }
@@ -188,8 +184,7 @@ static bool is_snake(char c) {
   tail ("wasd").
 */
 static char body_to_tail(char c) {
-  switch (c)
-  {
+  switch (c) {
   case RIGHT_BODY: {
     return RIGHT_TAIL;
   }
@@ -213,8 +208,7 @@ static char body_to_tail(char c) {
   body ("^<v>").
 */
 static char head_to_body(char c) {
-  switch (c)
-  {
+  switch (c) {
   case RIGHT_HEAD: {
     return RIGHT_BODY;
   }
@@ -238,12 +232,11 @@ static char head_to_body(char c) {
   Returns cur_row otherwise.
 */
 static unsigned int get_next_row(unsigned int cur_row, char c) {
-  if (c == DOWN_TAIL || c == DOWN_BODY ||c == DOWN_HEAD )
-  {
+  if (c == DOWN_TAIL || c == DOWN_BODY ||c == DOWN_HEAD ) {
     return cur_row + 1;
   }
-  if (c == UP_TAIL || c == UP_BODY || c == UP_HEAD )
-  {
+
+  if (c == UP_TAIL || c == UP_BODY || c == UP_HEAD ) {
     return cur_row - 1;
   }
   return cur_row;
@@ -255,12 +248,11 @@ static unsigned int get_next_row(unsigned int cur_row, char c) {
   Returns cur_col otherwise.
 */
 static unsigned int get_next_col(unsigned int cur_col, char c) {
-  if (c == LEFT_TAIL || c == LEFT_BODY ||c == LEFT_HEAD )
-  {
+  if (c == LEFT_TAIL || c == LEFT_BODY ||c == LEFT_HEAD ) {
     return cur_col - 1;
   }
-  if (c == RIGHT_TAIL || c == RIGHT_BODY ||c == RIGHT_HEAD )
-  {
+
+  if (c == RIGHT_TAIL || c == RIGHT_BODY ||c == RIGHT_HEAD ) {
     return cur_col + 1;
   }
   return cur_col;
@@ -278,8 +270,7 @@ static char next_square(game_state_t *state, unsigned int snum) {
   char head = get_board_at(state, snake->head_row, snake->head_col);
   unsigned int row  = get_next_row(snake->head_row, head);
   unsigned int col = get_next_col(snake->head_col, head);
-  if (head == UP_HEAD)
-  {
+  if (head == UP_HEAD) {
     printf("%d,%d\n", row, col);
   }
   
@@ -357,17 +348,17 @@ void update_state(game_state_t *state, int (*add_food)(game_state_t *state)) {
 
 /* Task 5.1 */
 char *read_line(FILE *fp) {
-  int buffer_size = 100;
+  const int buffer_size = 100;
   char *line = NULL;
   char buffer[buffer_size];
   size_t current_length = 0;
   while (fgets(buffer, buffer_size, fp) != NULL) {
     size_t length = strlen(buffer);
-        
+    
     // Reallocate memory to hold the accumulated line
     line = realloc(line, current_length + length + 1);
     if (line == NULL) {
-      return line;
+      allocation_failed();
     }
 
     // Copy the buffer to the accumulated line
@@ -385,15 +376,16 @@ char *read_line(FILE *fp) {
 /* Task 5.2 */
 game_state_t *load_board(FILE *fp) {
   game_state_t *state = malloc(sizeof(game_state_t));
-  char *line = read_line(fp);
+  char *line = NULL;
   unsigned int rows = 0;
   state->board = NULL;
-  while (line != NULL)
-  {
+  while ((line = read_line(fp)) != NULL) {
     rows++;
     state->board = realloc(state->board, rows*sizeof(char*));
+    if (state->board == NULL) {
+      allocation_failed();
+    }
     state->board[rows-1] = line;
-    line = read_line(fp);
   }
   state->num_rows = rows;
   state->num_snakes = 0;
@@ -429,12 +421,13 @@ game_state_t *initialize_snakes(game_state_t *state) {
   unsigned int snum = 0;
   for (unsigned int i = 1; i < state->num_rows-1; i++) {
     for (unsigned int j = 1; board[i][j] != WALL; j++) {
-      if (!is_tail(board[i][j]))
-      {
-        
-       continue;
+      if (!is_tail(board[i][j])) {
+        continue;
       }
       state->snakes = realloc(state->snakes, (snum+1)*sizeof(snake_t));
+      if (state->snakes == NULL) {
+        allocation_failed();
+      }
       state->snakes[snum].tail_row = i; 
       state->snakes[snum].tail_col = j;
       find_head(state, snum);
