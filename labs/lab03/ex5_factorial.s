@@ -1,7 +1,7 @@
 .globl factorial
 
 .data
-n: .word 0
+n: .word 8
 
 .text
 main:
@@ -25,12 +25,12 @@ main:
 # The return value should be stored in a0
 factorial:
     # YOUR CODE HERE
-    addi t1 t1 1
-Loop:
-    bge x0 a0 End
-    mul t1 t1 a0
-    addi a0 a0 -1
-    j Loop
-End:
-    mv a0 t1
+    mv t0 a0
+    li a0 1
+factorial_Loop:
+    bge x0 t0 factorial_End
+    mul a0 t0 a0
+    addi t0 t0 -1
+    j factorial_Loop
+factorial_End:
     jr ra
