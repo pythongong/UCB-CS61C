@@ -1,7 +1,7 @@
 .data
 # please don't change these!
-n: .word 2
-exp: .word 10
+n: .word 3
+exp: .word 3
 
 .text
 main:
@@ -39,14 +39,12 @@ ex2:
 
     # otherwise, return ex2(a0, a1-1) * a0
     mv s0 a0      # save a0 in s0
+ex2_loop:
     addi a1 a1 -1 # decrement a1
-
-    jal ra ex2    # call ex2(a0, a1-1)
-
+    beq a1 x0 ex2_end
     mul a0 a0 s0  # multiply ex2(a0, a1-1) by s0
                   # (which contains the value of a0)
-
-    j ex2_end
+    j ex2_loop    # call ex2(a0, a1-1)
 
 ex2_zero_case:
     li a0 1

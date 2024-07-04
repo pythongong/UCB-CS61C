@@ -38,14 +38,13 @@ ex3:
 
     # otherwise, return ex3(a0, a1-1) * a0
     mv t0 a0      # save a0 in t0
+ex3_loop:
     addi a1 a1 -1 # decrement a1
-
-    jal ra ex3    # call ex3(a0, a1-1)
-
+    beq a1 x0 ex3_end
     mul a0 a0 t0  # multiply ex3(a0, a1-1) by t0
                   # (which contains the value of a0)
-
-    j ex3_end
+    
+    j ex3_loop    # call ex3(a0, a1-1)
 
 # please don't change anything after this line!
 ex3_zero_case:
