@@ -131,6 +131,36 @@ class TestArgmax(unittest.TestCase):
         # generate the `assembly/TestArgmax_test_invalid_n.s` file and run it through venus
         t.execute(code=36)
 
+    def test_argmax_last(self):
+        t = AssemblyTest(self, "argmax.s")
+        # create an array in the data section
+        array0 = t.array([3, -42, 43, 7, -5, 6, 5, -114, 205])
+        # load address of the array into register a0
+        t.input_array("a0", array0)
+        # set a1 to the length of the array
+        t.input_scalar("a1", len(array0))
+        # call the `argmax` function
+        t.call("argmax")
+        # check that the register a0 contains the correct output
+        t.check_scalar("a0", 8)
+        # generate the `assembly/TestArgmax_test_simple.s` file and run it through venus
+        t.execute()
+
+    def test_argmax_repeated(self):
+        t = AssemblyTest(self, "argmax.s")
+        # create an array in the data section
+        array0 = t.array([3, -42, 6, 3, -5, 6, 5, -114, 6])
+        # load address of the array into register a0
+        t.input_array("a0", array0)
+        # set a1 to the length of the array
+        t.input_scalar("a1", len(array0))
+        # call the `argmax` function
+        t.call("argmax")
+        # check that the register a0 contains the correct output
+        t.check_scalar("a0", 2)
+        # generate the `assembly/TestArgmax_test_simple.s` file and run it through venus
+        t.execute()
+
 
 class TestDot(unittest.TestCase):
     def test_dot_standard(self):
