@@ -25,16 +25,100 @@
 write_matrix:
 
     # Prologue
+    addi sp sp -8
+    sw s0 0(sp)
+    sw ra 4(sp)
+    
+    mul s0 a2 a3
+    
+    # open file
+    addi sp sp -12
+    sw a1 0(sp)
+    sw a2 4(sp)
+    sw a3 8(sp)
+    
+    li a1 1
+    jal fopen
+    li t0 -1
+    beq a0 t0 fopen_error
+    
+    lw a1 0(sp)
+    lw a2 4(sp)
+    lw a3 8(sp)
+    addi sp sp 12
+    
+    # write rows number
+    addi sp sp -16
+    sw a0 0(sp)
+    sw a1 4(sp)
+    sw a2 8(sp)
+    sw a3 12(sp)
+    
+    li a1 0
+    addi a1 sp 8
+    li a2 1
+    li a3 4
+    jal fwrite
+    li t0 1
+    bne a0 t0 fwrite_error
+    
+    lw a0 0(sp)
+    lw a1 4(sp)
+    lw a3 12(sp)
+    addi sp sp 12
+    
+    # write columns number
+    addi sp sp -12
+    sw a0 0(sp)
+    sw a1 4(sp)
+    sw a3 8(sp)
+    
+    li a1 0
+    addi a1 sp 8
+    li a2 1
+    li a3 4
+    jal fwrite
+    li t0 1
+    bne a0 t0 fwrite_error
+    
+    lw a0 0(sp)
+    lw a1 4(sp)
+    addi sp sp 16
+    
+    # write matrix bytes
+    addi sp sp -4
+    sw a0 0(sp)
+    
+    mv a2 s0
+    li a3 4
+    jal fwrite
+    bne a0 s0 fwrite_error
+    
+    lw a0 0(sp)
+    addi sp sp 4
+    
 
-
-
-
-
-
-
+    # close the file
+    jal fclose
+    li t0 -1
+    beq a0 t0 fclose_error
 
 
     # Epilogue
-
+    lw s0 0(sp)
+    lw ra 4(sp)
+    addi sp sp 8
 
     jr ra
+
+fopen_error:
+    li a0 27
+    j exit
+
+fclose_error:
+    li a0 28
+    j exit
+    
+fwrite_error:
+    li a0 30
+    j exit

@@ -33,6 +33,7 @@ dot:
 
 loop_start:
     bge t0 a2 loop_end
+
     lw t2 0(t1)
     lw t3 0(a1)
     mul t3 t3 t2
