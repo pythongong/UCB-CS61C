@@ -233,14 +233,12 @@ classify:
     mv a1 s10
     lw a2 0(s3)
     lw a3 0(s7)
-    ebreak
     jal write_matrix
     
     lw a1 0(sp)
     lw a2 4(sp)
     addi sp sp 8
     
-    ebreak
     # Compute and return argmax(o)
     addi sp sp -8
     sw a1 0(sp)
@@ -326,7 +324,6 @@ free_matrix:
     lw ra 44(sp)
     addi sp sp 48
     
-    ebreak
     jr ra
 
 print_argmax:
