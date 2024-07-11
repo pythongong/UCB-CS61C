@@ -326,16 +326,6 @@ free_matrix:
     
     jr ra
 
-print_argmax:
-    addi sp sp -4
-    sw a0 0(sp)
-    jal print_int
-    li a0 '\n'
-    jal print_char
-    lw a0 0(sp)
-    addi sp sp 4
-    j free_matrix
-
 malloc_error:
     li a0 26
     j exit
@@ -355,3 +345,13 @@ malloc_int:
     lw ra 0(sp)
     addi sp sp 4
     jr ra
+
+print_argmax:
+    addi sp sp -4
+    sw a0 0(sp)
+    jal print_int
+    li a0 '\n'
+    jal print_char
+    lw a0 0(sp)
+    addi sp sp 4
+    j free_matrix
