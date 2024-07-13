@@ -11,3 +11,16 @@ To debug the program, use the following commands:
 - Use `p print_board(state, stdout)` to print out your entire board while debugging in cgdb.
 - `cgdb --args ./snake -i tests/TESTNAME-in.snk -o tests/TESTNAME-out.snk`
 - `valgrind ./snake -i tests/TESTNAME-in.snk -o tests/TESTNAME-out.snk`
+
+# Project 2
+
+# Project 3
+
+```
+bash tools/download_tools.sh
+
+java -jar tools/logisim-evolution.jar
+
+python3 tools/run_test.py tests/unit-alu/alu-add.circ
+
+```
