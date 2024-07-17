@@ -311,7 +311,7 @@
       <a name="label" val="B"/>
       <a name="width" val="32"/>
     </comp>
-    <comp lib="0" loc="(550,1500)" name="Tunnel">
+    <comp lib="0" loc="(550,1480)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="B"/>
       <a name="width" val="32"/>
@@ -386,10 +386,6 @@
       <a name="label" val="A"/>
       <a name="width" val="32"/>
     </comp>
-    <comp lib="0" loc="(580,1500)" name="Tunnel">
-      <a name="label" val="bsel"/>
-      <a name="width" val="32"/>
-    </comp>
     <comp lib="0" loc="(580,500)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="A"/>
@@ -427,6 +423,10 @@
       <a name="in_width" val="32"/>
       <a name="out_width" val="64"/>
       <a name="type" val="zero"/>
+    </comp>
+    <comp lib="0" loc="(630,1480)" name="Tunnel">
+      <a name="label" val="bsel"/>
+      <a name="width" val="32"/>
     </comp>
     <comp lib="0" loc="(660,1400)" name="Tunnel">
       <a name="label" val="sub0"/>
@@ -798,7 +798,7 @@
     <wire from="(550,1390)" to="(590,1390)"/>
     <wire from="(550,1410)" to="(550,1430)"/>
     <wire from="(550,1410)" to="(590,1410)"/>
-    <wire from="(550,1500)" to="(580,1500)"/>
+    <wire from="(550,1480)" to="(630,1480)"/>
     <wire from="(550,780)" to="(620,780)"/>
     <wire from="(550,820)" to="(620,820)"/>
     <wire from="(550,940)" to="(620,940)"/>
