@@ -23,4 +23,7 @@ java -jar tools/logisim-evolution.jar
 
 python3 tools/run_test.py tests/unit-alu/alu-add.circ
 
+python3 tools/run_test.py --pipelined tests/
+
+bash test.sh run_custom -p
 ```
