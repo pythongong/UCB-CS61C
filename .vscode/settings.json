@@ -6,6 +6,10 @@
         "snake_utils.h": "c",
         "state.h": "c",
         "stdint.h": "c",
-        "x86intrin.h": "c"
+        "x86intrin.h": "c",
+        "omp.h": "c",
+        "ex1.h": "c",
+        "math.h": "c",
+        "ex2.h": "c"
     }
 }
