@@ -1,6 +1,4 @@
 from framework import Test, TestSpec, Task, Matrix
-import filters
-
 
 @Test(seed=100)
 def test_example(test: TestSpec):

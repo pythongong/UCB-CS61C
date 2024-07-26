@@ -10,6 +10,9 @@
         "omp.h": "c",
         "ex1.h": "c",
         "math.h": "c",
-        "ex2.h": "c"
+        "ex2.h": "c",
+        "compute.h": "c",
+        "stdbool.h": "c",
+        "io.h": "c"
     }
 }

@@ -7,13 +7,13 @@ import os
 import random
 import struct
 import subprocess
+from scipy.signal import convolve2d
 
 from PIL import Image
 from PIL import ImageOps
 
 project_dir = Path(__file__).parent.resolve().parent
 tests_dir = project_dir / "tests"
-oracle_path = Path("/home/ff/cs61c/sp24/proj4/convolve_oracle")
 
 all_tests: Dict[str, "TestSpec"] = {}
 
@@ -23,13 +23,6 @@ FILTER_MULTIPLIER = 1e6
 def set_tests_dir(path: Path):
     global tests_dir
     tests_dir = path
-
-
-def run_oracle(a_path: Path, b_path: Path, out_path: Path):
-    if not oracle_path.exists():
-        raise RuntimeError(
-            "Oracle does not exist, please run on the hive machines")
-    subprocess.run([oracle_path, a_path, b_path, out_path])
 
 
 def randint(lower, upper, **kwargs):
@@ -114,13 +107,26 @@ class Task:
         assert a_matrix.rows >= b_matrix.rows, "Rows of matrix A must be greater than or equal to the rows in matrix B"
         assert a_matrix.cols >= b_matrix.cols, "Columns of matrix A must be greater than or equal to the columns in matrix B"
 
+        input_array = np.array(a_matrix.data).flatten().reshape((a_matrix.rows, a_matrix.cols))
+        filter_array = np.array(b_matrix.data).flatten().reshape((b_matrix.rows, b_matrix.cols))
+        input_array.tolist
+        conv_result = convolve2d(input_array, filter_array, mode='valid')
+        data = list(conv_result.flatten() & 0xFFFFFFFF)
+        self.ref_matrix = Matrix(a_matrix.rows-b_matrix.rows+1, a_matrix.cols-b_matrix.cols+1, data)
+
+
     def generate(self, path: Path):
         path.mkdir(exist_ok=True)
         self.a_matrix.generate(path / "a.bin")
         self.b_matrix.generate(path / "b.bin")
+        self.ref_matrix.generate(path / "ref.bin")
+
+        # output_matrix = Matrix.from_path(path / "out.bin")
+        # print(output_matrix.data[0])
+        # print(self.ref_matrix.data[0])
+
         a_md5 = md5sum(path / "a.bin")
         b_md5 = md5sum(path / "b.bin")
-
         try:
             with (path / ".hashes.json").open("r") as f:
                 hashes_json = json.load(f)
@@ -131,7 +137,7 @@ class Task:
 
         with (path / ".hashes.json").open("w") as f:
             f.write(json.dumps({"a.bin": a_md5, "b.bin": b_md5}))
-        run_oracle(path / "a.bin", path / "b.bin", path / "ref.bin")
+        # run_oracle(path / "a.bin", path / "b.bin", path / "ref.bin")
 
 
 class TestSpec:
@@ -164,10 +170,21 @@ class TestSpec:
         with (self.path / "input.txt").open("w") as f:
             f.write(str(len(tasks)) + "\n")
             for i, task in enumerate(tasks):
-                task_path = self.path / f"task{i}"
+                task_path = self.path / f"task{i}"   
                 task.generate(task_path)
                 rel_task_dir = os.path.relpath(task_path, self.path)
                 f.write(f"./{rel_task_dir}\n")
+                # if (i == 0) :
+                #    print("a") 
+                #    print(task.a_matrix.data)
+                #    print("b") 
+                #    print(task.b_matrix.data)
+                #    out = Matrix.from_path(task_path / "out.bin")
+                #    print("out") 
+                #    print(out.data)
+                #    print("ref") 
+                #    print(task.ref_matrix.data)
+
 
         if len(gifs) > 0:
             with (self.path / "gifs.json").open("w") as f:
