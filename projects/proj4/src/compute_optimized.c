@@ -53,7 +53,7 @@ int32_t convolved_result(matrix_t *a_matrix, matrix_t *b_matrix, int top, int le
     int dlp_limit = j + limit;
     int right_limit = start + right;
 
-    // use simd instructions to implement data level parallesim
+    // use SIMD instructions to implement data level parapllelism
     for (; j < dlp_limit; j+=8, b_index += 8) {
       __m256i a_vector = _mm256_loadu_si256((__m256i *) &a_data[j]);
       __m256i b_vector = _mm256_loadu_si256((__m256i *) &b_data[b_index]);
@@ -101,7 +101,7 @@ int convolve(matrix_t *a_matrix, matrix_t *b_matrix, matrix_t **output_matrix) {
   int num_threads = 7;
   omp_set_num_threads(convolution_rows < num_threads ? convolution_rows : num_threads);
 
-  // use openMP to implement concurrency level parapllesim
+  // use OpenMP to implement concurrency level parapllelism
   #pragma omp parallel for collapse(2)
   for (int top = 0; top < convolution_matrix->rows; top++) {
     for(int left = 0; left < convolution_matrix->cols;  left++) {
@@ -152,71 +152,3 @@ int execute_task(task_t *task) {
   free(output_matrix);
   return 0;
 }
-
-// int main(int argc, char const *argv[])
-// {
-
-//   matrix_t a_matrix;
-//   int32_t a_data[] = {7, 4, 9, 3, 5, 3, 7, 5, 9, 7, 2, 4, 9, 2, 10};
-//   a_matrix.rows = 5;
-//   a_matrix.cols = 3;
-//   a_matrix.data = a_data;
-
-//   matrix_t b_matrix;
-//   int32_t b_data[] = {9, 10, 5, 2, 4, 7, 8, 3};
-//   b_matrix.rows = 4;
-//   b_matrix.cols = 2;
-//   b_matrix.data = b_data;
-
-//   matrix_t *output_matrix;
-//   convolve(&a_matrix, &b_matrix, &output_matrix);
-//   int32_t* out = output_matrix->data;
-//   for (int i = 0; i < output_matrix->rows * output_matrix->cols; i++) {
-//     if((i+1) % output_matrix->cols == 0) {
-//       printf("%d\n", out[i]);
-//     } else {
-//       printf("%d,", out[i]);
-
-//     }
-//   }
-//   free(output_matrix->data);
-//   free(output_matrix);
-
-
-  // matrix_t a_matrix;
-  // int32_t a_data[] = {1, 1, 1, 1, 0, 2, 1, 2, 2};
-  // a_matrix.rows = 3;
-  // a_matrix.cols = 3;
-  // a_matrix.data = a_data;
-
-  // matrix_t b_matrix;
-  // int32_t b_data[] = {2, 1, 1, 0};
-  // b_matrix.rows = 2;
-  // b_matrix.cols = 2;
-  // b_matrix.data = b_data;
-
-  // matrix_t *output_matrix;
-  // convolve(&a_matrix, &b_matrix, &output_matrix);
-  // int32_t* out = output_matrix->data;
-  // for (int i = 0; i < output_matrix->rows * output_matrix->cols; i++) {
-  //   if((i+1) % output_matrix->cols == 0) {
-  //     printf("%d\n", out[i]);
-  //   } else {
-  //     printf("%d,", out[i]);
-
-  //   }
-  // }
-  // free(output_matrix->data);
-  // free(output_matrix);
-
-  // flip(&b_matrix);
-  // for (int i = 0; i < b_matrix.rows * b_matrix.cols; i++) {
-  //   if((i+1) % b_matrix.cols == 0) {
-  //     printf("%d\n", b_data[i]);
-  //   } else {
-  //     printf("%d,", b_data[i]);
-  //   }
-  // }
-
-//   return 0;
-// }
