@@ -175,15 +175,27 @@ class TestSpec:
                 rel_task_dir = os.path.relpath(task_path, self.path)
                 f.write(f"./{rel_task_dir}\n")
                 # if (i == 0) :
+                #     out = Matrix.from_path(task_path / "out.bin")
+                #     print("out") 
+                #     print(out.data)
+                #     print("ref") 
+                #     print(task.ref_matrix.data)
+
+                    # print("out 0") 
+                    # print(out.data[0])
+                    # print("ref 0") 
+                    # print(task.ref_matrix.data[0])
+
+                   
+                #    print("out 0") 
+                #    print(out.data[out.rows*out.cols - 1])
+                #    print("ref 0") 
+                #    print(task.ref_matrix.data[task.ref_matrix.rows * task.ref_matrix.cols - 1])
+
                 #    print("a") 
                 #    print(task.a_matrix.data)
                 #    print("b") 
                 #    print(task.b_matrix.data)
-                #    out = Matrix.from_path(task_path / "out.bin")
-                #    print("out") 
-                #    print(out.data)
-                #    print("ref") 
-                #    print(task.ref_matrix.data)
 
 
         if len(gifs) > 0:

@@ -36,66 +36,40 @@ void flip(matrix_t *origin_matrix) {
   
 }
 
-// void init_overlap(int32_t* overlap_matrix, ) {
-
-// }
-
-int32_t convolved_result(matrix_t *a_matrix, matrix_t *b_matrix, int top, int bottom, int left, int right) {
-  int tmp[8];
-  int size = b_matrix->rows * b_matrix->cols;
-  int32_t overlap[size];
-  int dlp_limit = (size / 8) * 8;
+int32_t convolved_result(matrix_t *a_matrix, matrix_t *b_matrix, int top, int left) {
   int result = 0;
-  int index = 0;
-  __m256i sum_vector = _mm256_setzero_si256();
+  int limit = (b_matrix->cols / 8) * 8;
+  int b_index = 0;
+  int bottom = top + b_matrix->rows - 1;
+  int right = left + b_matrix->cols - 1;
   int32_t* a_data = a_matrix->data;
   int32_t* b_data = b_matrix->data;
+  int tmp[8];
+  __m256i sum_vector = _mm256_setzero_si256();
 
-  for (int i = top; i <= bottom; i++) {
+  for (int i = bottom - b_matrix->rows + 1; i <= bottom; i++) {
     int start = i * a_matrix->cols;
-    int j = left;
-    for(; j <= right; j++) {
-      overlap[index++] = a_data[start + j];
+    int j = start + left;
+    int dlp_limit = j + limit;
+    int right_limit = start + right;
+
+    // use simd instructions to implement data level parallesim
+    for (; j < dlp_limit; j+=8, b_index += 8) {
+      __m256i a_vector = _mm256_loadu_si256((__m256i *) &a_data[j]);
+      __m256i b_vector = _mm256_loadu_si256((__m256i *) &b_data[b_index]);
+      __m256i product_vector = _mm256_mullo_epi32(a_vector, b_vector);
+      sum_vector = _mm256_add_epi32(sum_vector, product_vector);
     }
 
-    // int dlp_limit = (right / 8) * 8;
-    // for (; j < dlp_limit; j+=8) {
-    //   __m256i a_vector = _mm256_loadu_si256((__m256i *) a_data+start+j);
-    //   __m256i b_vector = _mm256_loadu_si256((__m256i *) b_data+start+j);
-    //   __m256i product_vector = _mm256_mul_epi32(a_vector, b_vector);
-    //   sum_vector = _mm256_add_epi32(sum_vector, product_vector);
-    // }
-    // for(; j <= right; j++) {
-    //   result += a_data[start+j]*b_data[start+j];
-    // }
-    
-  }
-  
-  for (index = 0; index < dlp_limit; index += 8) {
-    __m256i a_vector = _mm256_loadu_si256((__m256i *) overlap+index);
-    __m256i b_vector = _mm256_loadu_si256((__m256i *) b_data+index);
-    __m256i product_vector = _mm256_mullo_epi32(a_vector, b_vector);
-    // int32_t* values = (int32_t*)&product_vector;
-    // for (int i = 0; i < 8; i++) { // __m256i contains 8 int32_t values
-    //     printf("%d,", values[i]);
-    // }
-    // printf("product\n");
-    sum_vector = _mm256_add_epi32(sum_vector, product_vector);
-    // values = (int32_t*)&sum_vector;
-    // for (int i = 0; i < 8; i++) { // __m256i contains 8 int32_t values
-    //     printf("%d,", values[i]);
-    // }
-    // printf("sum\n");
+    // tail case of each row 
+    for(; j <= right_limit; j++) {
+      result += a_data[j]*b_data[b_index++];
+    }
   }
 
   _mm256_storeu_si256((__m256i *) tmp, sum_vector);
   for (int i = 0; i < 8; i++) {
     result += tmp[i];
-  }
-  
-
-  for(; index < size; index++) {
-    result += overlap[index] * b_data[index];
   }
   return result;
 }
@@ -103,28 +77,40 @@ int32_t convolved_result(matrix_t *a_matrix, matrix_t *b_matrix, int top, int bo
 // convolve matrix a and matrix b, and store the resulting matrix in
 int convolve(matrix_t *a_matrix, matrix_t *b_matrix, matrix_t **output_matrix) {
   int a_rows = a_matrix->rows;
+  int a_cols = a_matrix->cols;
+  int b_rows = b_matrix->rows;
   int b_cols = b_matrix->cols;
+  int convolution_rows = a_rows - b_rows + 1;
+  int convolution_cols = a_cols - b_cols + 1;
+
+  // flip b matrix first 
   flip(b_matrix);
-  int i = 0;
-  matrix_t* convolved_matrix = malloc(sizeof(matrix_t));
-  if (convolved_matrix == NULL) {
+
+  matrix_t* convolution_matrix = malloc(sizeof(matrix_t));
+  if (convolution_matrix == NULL) {
     allocation_failed();
   }
-  convolved_matrix->rows = a_rows - b_matrix->rows + 1;
-  convolved_matrix->cols = a_matrix->cols - b_cols + 1;
-  int32_t *data = malloc(convolved_matrix->rows * convolved_matrix->cols * sizeof(int32_t));
+
+  convolution_matrix->rows = convolution_rows;
+  convolution_matrix->cols = convolution_cols;
+  int32_t *data = malloc(convolution_rows * convolution_cols * sizeof(int32_t));
   if (data == NULL) {
     allocation_failed();
   }
-  
-  for (int top = 0, bottom = b_matrix->rows-1; bottom < a_rows; top++, bottom++) {
-    for(int left = 0, right = b_cols-1; right < a_matrix->cols; left++, right++) {
-      data[i] = convolved_result(a_matrix, b_matrix, top, bottom, left, right);
-      i++;
+
+  int num_threads = 7;
+  omp_set_num_threads(convolution_rows < num_threads ? convolution_rows : num_threads);
+
+  // use openMP to implement concurrency level parapllesim
+  #pragma omp parallel for collapse(2)
+  for (int top = 0; top < convolution_matrix->rows; top++) {
+    for(int left = 0; left < convolution_matrix->cols;  left++) {
+      data[top * convolution_matrix->cols + left] =  convolved_result(a_matrix, b_matrix, top, left);
     }
   }
-  convolved_matrix->data = data;
-  *(output_matrix) = convolved_matrix;
+
+  convolution_matrix->data = data;
+  *(output_matrix) = convolution_matrix;
   return 0;
 }
 
