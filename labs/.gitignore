@@ -414,6 +414,8 @@ dkms.conf
 
 # Package Files #
 *.jar
+!tools/Camera.jar
+.gitignore
 *.war
 *.nar
 *.ear
