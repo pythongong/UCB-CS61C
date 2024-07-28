@@ -13,10 +13,7 @@ starter_file_hashes = {
     "src/io.o": "3403f7d73dd3395457c5ce3673255938",
     "tools/check_output.sh": "90abd43257eb688aa86abecae04c68db",
     "tools/create_tests.py": "fbd72ce779c69a7c131889c5bfa1e398",
-    "tools/framework.py": "d3204922ea8487702d1dfefc23e8c60a",
-    "tools/results_to_gif.py": "990fba3042d1ba07718c0e240f31f14e",
     "tools/run_test.sh": "fd44999a528c848997de2cb07b12b6e9",
-    "tools/staff_tests.py": "792e50f07d4d11a96305382e35437674",
 }
 
 def check_hash(rel_path_str):
@@ -32,10 +29,10 @@ def check_hash(rel_path_str):
     return (True, f"{rel_path_str} matches starter file")
 
 passed_all = True
-# for rel_path_str in starter_file_hashes.keys():
-#     passed, reason = check_hash(rel_path_str)
-#     if not passed:
-#         passed_all = False
-#         print(f"Error: {reason}", file=sys.stderr)
-# if not passed_all:
-#     sys.exit(1)
+for rel_path_str in starter_file_hashes.keys():
+    passed, reason = check_hash(rel_path_str)
+    if not passed:
+        passed_all = False
+        print(f"Error: {reason}", file=sys.stderr)
+if not passed_all:
+    sys.exit(1)

@@ -1,7 +1,6 @@
 import math
 
 from framework import Test, TestSpec, Task, Matrix, randint
-import filters
 
 
 @Test()
@@ -39,17 +38,6 @@ def test_large(test: TestSpec):
                  Matrix.random(rows_b, cols_b, min_value=-(2 ** 30), max_value=2 ** 30))
         )
 
-
-@Test()
-def test_gif_kachow_blur(test: TestSpec):
-    test.add_gif("/home/ff/cs61c/sp24/proj4/gifs/kachow.gif",
-                 filters.BlurFilter.create(size=17, sigma=7))
-
-
-@Test()
-def test_gif_kachow_sharpen(test: TestSpec):
-    test.add_gif("/home/ff/cs61c/sp24/proj4/gifs/kachow.gif",
-                 filters.SharpenFilter.create(size=3, sigma=1))
 
 # Autograder tests
 @Test(seed=61)

@@ -13,6 +13,7 @@
         "ex2.h": "c",
         "compute.h": "c",
         "stdbool.h": "c",
-        "io.h": "c"
+        "io.h": "c",
+        "mpi.h": "c"
     }
 }

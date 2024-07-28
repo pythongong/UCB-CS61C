@@ -7,15 +7,13 @@ def test_example(test: TestSpec):
 
 @Test()
 def my_custom_test(test: TestSpec):
-    # rows_a = randint(15, 25)
-    # cols_a = randint(15, 25) 
-    # rows_b = randint(5, 15)
-    # cols_b = randint(5, 15)
-    # print(rows_a, cols_a)
-    # print(rows_b, cols_b)
-    # test.add_task(
-    #     Task(Matrix.random(rows_a, cols_a), Matrix.random(rows_b, cols_b))
-    # )
-    test.add_task(Task(Matrix.random(4, 4, min_value=1, max_value=10),
-                  Matrix.random(2, 2, min_value=1, max_value=10)))
+    for _ in range(5000):
+        rows_a = randint(100, 100)
+        cols_a = randint(100, 100)
+        rows_b = randint(20, 40)
+        cols_b = randint(20, 40)
+        test.add_task(
+            Task(Matrix.random(rows_a, cols_a, min_value=-(2 ** 30), max_value=2 ** 30),
+                 Matrix.random(rows_b, cols_b, min_value=-(2 ** 30), max_value=2 ** 30))
+        )
         
