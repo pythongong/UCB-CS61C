@@ -14,6 +14,15 @@ To debug the program, use the following commands:
 
 # Project 2
 
+```
+bash tools/download_tools.sh
+
+java -jar tools/venus.jar . -dm
+
+```
+
+https://venus.cs61c.org/
+
 # Project 3
 
 ```

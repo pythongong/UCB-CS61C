@@ -1,19 +1,19 @@
 Scenario 1
-    1.
-    2.
-    3.
+    1. block size, number of blocks
+    2. 0.0
+    3. Array Size, 32
 
 Scenario 2
-    1.
-    2.
-    3.
+    1. 256
+    2. 
+    3. 1.0
 
 Scenario 3
-    1.
-    2.
-    3.
-    4.
-    5.
+    1. 0.5, 0.0, 0.33
+    2. 32, 16
+    3. 16
+    4. Rep Count
+    5. =_L1. =_L2, +_L1, +_L2
 
 --- lines below are ignored by the AG ---
 

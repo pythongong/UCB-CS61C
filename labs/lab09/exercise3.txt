@@ -7,7 +7,7 @@ Part 1
     blocksize = 20, n = 5000: 
     blocksize = 20, n = 10000: 
 
-    Checkoff Question 1:
+    Checkoff Question 1: When n = 1000, cache blocked version becomes faster.
     Checkoff Question 2:
 
 Part 2
@@ -17,4 +17,8 @@ Part 2
     blocksize = 1000, n = 10000:
     blocksize = 5000, n = 10000:
 
-    Checkoff Question 3:
+    Checkoff Question 3: The performance becomes better when blocksize goes from 50 to 500 
+    while it becomes worse when blocksize goes from 500 60 5000. 
+    This is becourse when blocksize becomes larger than 1000, 
+    the cache can't whole block and will evict old values from the cache 
+    even if these old values will be use in the next loop.

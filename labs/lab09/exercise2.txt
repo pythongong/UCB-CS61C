@@ -1,8 +1,13 @@
-1.
-2.
+1. jki, kji
+2. ikj, kij
 
 --- lines below are ignored by the AG ---
 
-Checkoff Question 1:
-Checkoff Question 2:
-Checkoff Question 3:
+Checkoff Question 1: As j and k both multiplication opeation, so we need to make sure that they 
+change as least as possible. We put j and k in the outer loop. As j multiplies twice in the loop, 
+so the speed is fastest when we put j in the outermost loop.
+
+Checkoff Question 2: We put j in the innermost loop so the speed is the slowerest.
+
+Checkoff Question 3: We should put variables that we stride through with the simplest operations 
+in the innermost loop.
