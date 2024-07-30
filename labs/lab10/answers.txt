@@ -1,13 +1,13 @@
 Exercise 1:
-    1.
-    2.
-    3.
+    1. 32
+    2. 4, 6, 0, 6
+    3. No, No
 
 Exercise 2:
-    1.
+    1. 0F, 20, 40, 60, 80, A0, C0, E0, 21, 41
 
 Exercise 3:
-    1.
+    1. 0F, 20, 05, 25, 80, A0, C0, E0, 21, 41
 
 --- lines below are ignored by the AG ---
 

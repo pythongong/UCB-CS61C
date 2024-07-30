@@ -36,3 +36,9 @@ python3 tools/run_test.py --pipelined tests/
 
 bash test.sh run_custom -p
 ```
+
+# Labs
+
+```
+java -jar tools/Camera.jar
+```
