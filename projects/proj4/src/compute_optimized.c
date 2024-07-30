@@ -37,21 +37,19 @@ void flip(matrix_t *origin_matrix) {
 }
 
 int32_t convolved_result(matrix_t *a_matrix, matrix_t *b_matrix, int top, int left) {
-  int result = 0;
-  int limit = (b_matrix->cols / 8) * 8;
-  int b_index = 0;
-  int bottom = top + b_matrix->rows - 1;
-  int right = left + b_matrix->cols - 1;
-  int32_t* a_data = a_matrix->data;
-  int32_t* b_data = b_matrix->data;
   int tmp[8];
   __m256i sum_vector = _mm256_setzero_si256();
-
+  int32_t* a_data = a_matrix->data;
+  int32_t* b_data = b_matrix->data;
+  int result = 0;
+  int limit = (b_matrix->cols / 8) * 8;
+  int bottom = top + b_matrix->rows - 1;
+  int right = left + b_matrix->cols - 1;
+  int b_index = 0;
   for (int i = bottom - b_matrix->rows + 1; i <= bottom; i++) {
     int start = i * a_matrix->cols;
     int j = start + left;
     int dlp_limit = j + limit;
-    int right_limit = start + right;
 
     // use SIMD instructions to implement data level parapllelism
     for (; j < dlp_limit; j+=8, b_index += 8) {
@@ -62,7 +60,7 @@ int32_t convolved_result(matrix_t *a_matrix, matrix_t *b_matrix, int top, int le
     }
 
     // tail case of each row 
-    for(; j <= right_limit; j++) {
+    for(; j <= start + right; j++) {
       result += a_data[j]*b_data[b_index++];
     }
   }
@@ -76,16 +74,8 @@ int32_t convolved_result(matrix_t *a_matrix, matrix_t *b_matrix, int top, int le
 
 // convolve matrix a and matrix b, and store the resulting matrix in
 int convolve(matrix_t *a_matrix, matrix_t *b_matrix, matrix_t **output_matrix) {
-  int a_rows = a_matrix->rows;
-  int a_cols = a_matrix->cols;
-  int b_rows = b_matrix->rows;
-  int b_cols = b_matrix->cols;
-  int convolution_rows = a_rows - b_rows + 1;
-  int convolution_cols = a_cols - b_cols + 1;
-
-  // flip b matrix first 
-  flip(b_matrix);
-
+  int convolution_rows = a_matrix->rows - b_matrix->rows + 1;
+  int convolution_cols = a_matrix->cols - b_matrix->cols + 1;
   matrix_t* convolution_matrix = malloc(sizeof(matrix_t));
   if (convolution_matrix == NULL) {
     allocation_failed();
@@ -97,15 +87,18 @@ int convolve(matrix_t *a_matrix, matrix_t *b_matrix, matrix_t **output_matrix) {
   if (data == NULL) {
     allocation_failed();
   }
+  
+  // flip b matrix first 
+  flip(b_matrix);
 
   int num_threads = 7;
   omp_set_num_threads(convolution_rows < num_threads ? convolution_rows : num_threads);
 
   // use OpenMP to implement concurrency level parapllelism
   #pragma omp parallel for collapse(2)
-  for (int top = 0; top < convolution_matrix->rows; top++) {
-    for(int left = 0; left < convolution_matrix->cols;  left++) {
-      data[top * convolution_matrix->cols + left] =  convolved_result(a_matrix, b_matrix, top, left);
+  for (int top = 0; top < convolution_rows; top++) {
+    for(int left = 0; left < convolution_cols;  left++) {
+      data[top * convolution_cols + left] =  convolved_result(a_matrix, b_matrix, top, left);
     }
   }
 
