@@ -1,8 +1,7 @@
 # UCB-CS61C
 
 All projects as well as lab 01-08 are from the summer 2024 course. Lab 09-10 are from the fall 2022 course.  Course website: 
-- https://cs61c.org/su24 
-- https://cs61c.org/fa20
+- [https://cs61c.org/su24 ](https://web.archive.org/web/20240827122147/https://cs61c.org/su24/)
 
 # Projoect 1: snek
 
